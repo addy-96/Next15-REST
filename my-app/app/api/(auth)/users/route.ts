@@ -1,6 +1,6 @@
 import connect from "@/lib/db";
 import User from "@/lib/models/users";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import {Types} from "mongoose";
 
 const ObjectId = require("mongoose").Types.ObjectId;
@@ -15,16 +15,17 @@ export const GET = async () => {
     }
 }
 
-export const POST = async (request : Request) => {
+export const POST = async (request : NextRequest) => {
     try{
-        const body = request.json();
+        const body = await request.json();
+        console.log(body);
         await connect(); 
         const user = new User(body);
         await user.save();
 
         return new NextResponse(JSON.stringify({message: "User is created", user: user}), {status: 200});
     }catch(err : any){
-        return new NextResponse('Error in creating user'+ err.message, {status: 500});
+        return new NextResponse('Error in creating user : '+ err.message, {status: 500});
     }
 }
 
@@ -61,5 +62,38 @@ export const PATCH = async (request: Request) => {
 
     }catch(err){
            return new NextResponse('Error in updatingc user'+ err.message, {status: 500});
+    }
+}
+
+export const DELETE = async (request: Request) => {
+    try{
+        const {searchParams} =  new URL(Request.url);
+        const userId = searchParams.get('userId');
+
+        if(userId){
+            return new NextResponse(
+                JSON.stringify({message: "ID not found."}), {status:400}
+            );
+        }
+
+        if(!Types.ObjectId.isValid(userId)){
+            return new NextResponse(JSON.stringify({message: "Invalid User id"}),{status:400})
+        }
+
+        await connect();
+
+        const deletedUser = await User.findByIdAndDelete(new Types.ObjectId(userId));
+
+        if(!deletedUser) {
+            return new NextResponse(
+                JSON.stringify({message : "User not found in database"}),
+                 {status : 400}
+            );
+        }
+
+        return new NextResponse(JSON.stringify({message: "User deleted!"}),{status:200});
+
+    }catch(err){
+        return new NextResponse('Error in updatingc user'+ err.message, {status: 500});
     }
 }
