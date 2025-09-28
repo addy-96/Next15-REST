@@ -18,7 +18,7 @@ export const GET = async () => {
 export const POST = async (request : NextRequest) => {
     try{
         const body = await request.json();
-        console.log(body);
+
         await connect(); 
         const user = new User(body);
         await user.save();
