@@ -46,12 +46,12 @@ export const POST = async (request: NextRequest) => {
           if(!createCategory) return new NextResponse(JSON.stringify({message: 'Error in creating category.'}, {status: 500}));
           else{
             return new NextResponse(
-                JSON.stringify({message: 'Categoory cretaed Successfully.'}) ,{status: 200}
+                JSON.stringify({message: 'Category cretaed Successfully.'}) ,{status: 200}
             );
           }
            
         }catch(err : any){
-          return new NextResponse("Error in creating category" + err.message, {status: 500});
+          return new NextResponse("Error in creating category." + err.message, {status: 500});
         }
 }
 
